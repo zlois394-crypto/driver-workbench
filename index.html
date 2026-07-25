@@ -801,11 +801,25 @@ function renderRebate(){
             ${d.note?`<span>📝${d.note}</span>`:''}
           </div>
         </div>
-        <button class="btn sm ghost" onclick="openDriverModal('${d.id}')">编辑</button>
+        <div style="display:flex;gap:6px">
+          <button class="btn sm ghost" onclick="openDriverModal('${d.id}')">编辑</button>
+          <button class="btn sm" style="background:var(--danger);color:#fff;padding:7px 10px" onclick="deleteDriver('${d.id}','${d.name}')">删除</button>
+        </div>
       </div>
       ${nodesHtml}
     </div>`;
   }).join('');
+}
+
+function deleteDriver(driverId, driverName){
+  if(!confirm(`确认删除司机「${driverName}」？\n\n删除后该司机的所有反费记录和关联收入也会一起删除，此操作不可恢复！`)) return;
+  // 同时删除关联的收入交易记录
+  db.txns = db.txns.filter(t=>t.driverId!==driverId);
+  // 删除司机记录
+  db.drivers = db.drivers.filter(d=>d.id!==driverId);
+  saveDB();
+  renderRebate();
+  toast('✅ 已删除司机');
 }
 
 function confirmRebate(driverId, nodeLabel, amount){
