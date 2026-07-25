@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="司机招募工作台">
+<meta name="theme-color" content="#0ea5e9">
+<title>网约车司机招募工作台</title>
+<style>
+:root{
+  --primary:#0ea5e9;
+  --primary-dark:#0284c7;
+  --success:#22c55e;
+  --warn:#f59e0b;
+  --danger:#ef4444;
+  --bg:#f1f5f9;
+  --card:#ffffff;
+  --text:#0f172a;
+  --text-sub:#64748b;
+  --border:#e2e8f0;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --radius:14px;
+  --tab-h:62px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);
+  font-size:15px;line-height:1.5;
+  padding-bottom:calc(var(--tab-h) + env(safe-area-inset-bottom));
+  -webkit-font-smoothing:antialiased;
+}
+input,button,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+input[type=number]{-webkit-appearance:none}
+/* ===== 顶部 ===== */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff;padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;
+  box-shadow:0 2px 8px rgba(14,165,233,.25);
+}
+.topbar h1{font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px}
+.topbar .sub{font-size:12px;opacity:.85;margin-top:2px}
+.topbar .goal-bar{margin-top:10px;background:rgba(255,255,255,.2);border-radius:8px;height:8px;overflow:hidden}
+.topbar .goal-bar i{display:block;height:100%;background:#fff;border-radius:8px;transition:width .5s}
+.topbar .goal-txt{display:flex;justify-content:space-between;font-size:11px;opacity:.9;margin-top:4px}
+/* ===== 容器 ===== */
+.page{display:none;padding:14px 12px}
+.page.active{display:block}
+.card{
+  background:var(--card);border-radius:var(--radius);padding:14px;
+  box-shadow:var(--shadow);margin-bottom:12px;
+}
+.card-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.card-title .more{font-size:12px;color:var(--primary);font-weight:400}
+/* ===== 底部Tab ===== */
+.tabbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:100;
+  height:calc(var(--tab-h) + env(safe-area-inset-bottom));
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(12px);
+  border-top:1px solid var(--border);
+  display:flex;padding-bottom:env(safe-area-inset-bottom);
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;color:var(--text-sub);font-size:11px;transition:color .2s;
+  padding-top:6px;
+}
+.tab .ico{font-size:20px;line-height:1}
+.tab.active{color:var(--primary)}
+/* ===== 表单 ===== */
+.field{margin-bottom:10px}
+.field label{display:block;font-size:12px;color:var(--text-sub);margin-bottom:4px}
+.field input,.field select,.field textarea{
+  width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;
+  background:#f8fafc;font-size:15px;outline:none;transition:border .2s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary);background:#fff}
+.field textarea{resize:vertical;min-height:70px}
+.row{display:flex;gap:10px}
+.row .field{flex:1}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:11px 16px;border-radius:10px;font-size:15px;font-weight:500;
+  background:var(--primary);color:#fff;width:100%;transition:opacity .2s;
+}
+.btn:active{opacity:.8}
+.btn.ghost{background:#f1f5f9;color:var(--text)}
+.btn.success{background:var(--success)}
+.btn.warn{background:var(--warn)}
+.btn.danger{background:var(--danger)}
+.btn.sm{padding:7px 12px;font-size:13px;width:auto}
+/* ===== 列表项 ===== */
+.item{
+  display:flex;align-items:center;gap:10px;padding:12px 0;
+  border-bottom:1px solid var(--border);
+}
+.item:last-child{border-bottom:none}
+.item .avatar{
+  width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;background:#e0f2fe;color:var(--primary-dark);
+}
+.item .body{flex:1;min-width:0}
+.item .body .t{font-size:14px;font-weight:500;display:flex;justify-content:space-between;gap:8px}
+.item .body .d{font-size:12px;color:var(--text-sub);margin-top:2px}
+.item .body .meta{font-size:11px;color:var(--text-sub);margin-top:3px;display:flex;gap:8px;flex-wrap:wrap}
+/* ===== 徽章 ===== */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:500}
+.badge.warn{background:#fef3c7;color:#92400e}
+.badge.success{background:#dcfce7;color:#166534}
+.badge.danger{background:#fee2e2;color:#991b1b}
+.badge.info{background:#e0f2fe;color:#075985}
+.badge.gray{background:#f1f5f9;color:#64748b}
+/* ===== 统计卡 ===== */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.stat{background:var(--card);border-radius:var(--radius);padding:12px;box-shadow:var(--shadow)}
+.stat .lbl{font-size:11px;color:var(--text-sub)}
+.stat .val{font-size:20px;font-weight:700;margin-top:2px}
+.stat .val.success{color:var(--success)}
+.stat .val.danger{color:var(--danger)}
+.stat .val.warn{color:var(--warn)}
+.stat .delta{font-size:11px;color:var(--text-sub);margin-top:2px}
+/* ===== 进度 ===== */
+.progress{background:#e2e8f0;border-radius:6px;height:7px;overflow:hidden;margin:4px 0}
+.progress i{display:block;height:100%;border-radius:6px;transition:width .5s}
+/* ===== 浮动按钮 ===== */
+.fab{
+  position:fixed;right:16px;bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + 16px);
+  width:54px;height:54px;border-radius:50%;background:var(--primary);color:#fff;
+  font-size:28px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(14,165,233,.45);z-index:90;
+}
+.fab:active{transform:scale(.92)}
+/* ===== 弹窗 ===== */
+.modal-mask{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
+  display:none;align-items:flex-end;justify-content:center;
+}
+.modal-mask.show{display:flex}
+.modal{
+  background:#fff;width:100%;max-width:520px;border-radius:18px 18px 0 0;
+  padding:18px 16px calc(18px + env(safe-area-inset-bottom));
+  max-height:88vh;overflow-y:auto;animation:slideUp .25s ease;
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal h3{font-size:17px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.modal h3 .close{font-size:22px;color:var(--text-sub);padding:4px}
+/* ===== 提醒条 ===== */
+.alert-bar{
+  background:linear-gradient(90deg,#fef3c7,#fde68a);color:#92400e;
+  padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:12px;
+  display:flex;align-items:flex-start;gap:8px;
+}
+.alert-bar.danger{background:linear-gradient(90deg,#fee2e2,#fecaca);color:#991b1b}
+.alert-bar .ico{font-size:18px;flex-shrink:0}
+/* ===== 内容创作 ===== */
+.topic-item{
+  padding:12px;background:#f8fafc;border-radius:10px;margin-bottom:10px;
+  border-left:3px solid var(--primary);
+}
+.topic-item .tt{font-size:14px;font-weight:600;margin-bottom:4px}
+.topic-item .dd{font-size:12px;color:var(--text-sub);margin-bottom:8px;white-space:pre-line;line-height:1.6}
+.topic-item .acts{display:flex;gap:8px;flex-wrap:wrap}
+.tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;background:#e0f2fe;color:#075985;margin-right:4px}
+/* ===== 空状态 ===== */
+.empty{text-align:center;padding:30px 10px;color:var(--text-sub);font-size:13px}
+.empty .ico{font-size:40px;display:block;margin-bottom:8px;opacity:.5}
+/* ===== 切换组 ===== */
+.seg{display:flex;background:#e2e8f0;border-radius:8px;padding:2px;margin-bottom:12px}
+.seg button{flex:1;padding:7px;font-size:13px;border-radius:6px;color:var(--text-sub)}
+.seg button.active{background:#fff;color:var(--primary);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+/* ===== 日历选择 ===== */
+.day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
+.day-grid .dc{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;background:#f8fafc;color:var(--text-sub);position:relative}
+.day-grid .dc.has{background:#dcfce7;color:#166534;font-weight:600}
+.day-grid .dc.today{outline:2px solid var(--primary)}
+.day-grid .dc .dot{position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--success)}
+/* ===== 历史记录折叠 ===== */
+details{margin-top:8px}
+summary{font-size:13px;color:var(--primary);cursor:pointer;padding:6px 0}
+</style>
+</head>
+<body>
+
+<!-- ===== 顶部栏 ===== -->
+<header class="topbar" id="topbar">
+  <h1>🚗 司机招募工作台</h1>
+  <div class="sub" id="topDate"></div>
+  <div class="goal-bar"><i id="goalBar" style="width:0%"></i></div>
+  <div class="goal-txt">
+    <span id="goalTxt">本月目标计算中</span>
+    <span id="goalPct">0%</span>
+  </div>
+</header>
+
+<!-- ===== 页面1: 今日 ===== -->
+<section class="page active" id="page-today">
+  <div id="todayAlerts"></div>
+
+  <div class="card">
+    <div class="card-title">
+      <span>📊 今日概览 <span id="todayDateLbl" style="font-weight:400;color:var(--text-sub);font-size:12px"></span></span>
+    </div>
+    <div class="stats-grid" style="margin-bottom:0">
+      <div class="stat"><div class="lbl">今日进账</div><div class="val success" id="todayIncome">¥0</div></div>
+      <div class="stat"><div class="lbl">今日支出</div><div class="val danger" id="todayExpense">¥0</div></div>
+      <div class="stat"><div class="lbl">日目标</div><div class="val" id="dayGoal">¥0</div></div>
+      <div class="stat"><div class="lbl">完成率</div><div class="val warn" id="dayRate">0%</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>✏️ 工作记录</span></div>
+    <div class="field">
+      <label>今日工作内容</label>
+      <textarea id="workContent" placeholder="例如：发布招聘信息、联系意向司机5人、带看车辆2人..."></textarea>
+    </div>
+    <div class="row">
+      <div class="field"><label>工作时长(小时)</label><input type="number" id="workHours" placeholder="8" step="0.5"></div>
+      <div class="field"><label>休息时长(小时)</label><input type="number" id="restHours" placeholder="2" step="0.5"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>视频剪辑完成</label>
+        <select id="videoDone"><option value="0">0 条</option><option value="1">1 条</option><option value="2">2 条</option><option value="3">3 条</option><option value="4">4 条</option></select>
+      </div>
+      <div class="field"><label>公众号完成</label>
+        <select id="articleDone"><option value="0">0 篇</option><option value="1">1 篇</option><option value="2">2 篇</option><option value="3">3 篇</option><option value="4">4 篇</option><option value="5">5 篇</option></select>
+      </div>
+    </div>
+    <button class="btn" onclick="saveToday()">💾 保存今日记录</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>💰 今日收支</span><span class="more" onclick="openModal('incomeModal')">+收入</span></div>
+    <div id="todayTxnList"></div>
+  </div>
+</section>
+
+<!-- ===== 页面2: 反费追踪 ===== -->
+<section class="page" id="page-rebate">
+  <div id="rebateAlerts"></div>
+  <div class="card">
+    <div class="card-title">
+      <span>🎯 反费追踪</span>
+      <button class="btn sm" onclick="openModal('driverModal')">+ 录入司机</button>
+    </div>
+    <div class="seg">
+      <button class="active" onclick="switchRebateTab(this,'pending')">待收反费</button>
+      <button onclick="switchRebateTab(this,'done')">已收反费</button>
+      <button onclick="switchRebateTab(this,'all')">全部</button>
+    </div>
+    <div id="driverList"></div>
+  </div>
+</section>
+
+<!-- ===== 页面3: 财务 ===== -->
+<section class="page" id="page-finance">
+  <div class="card">
+    <div class="card-title"><span>📅 <span id="financeMonth"></span> 财务概览</span></div>
+    <div class="stats-grid" style="margin-bottom:0">
+      <div class="stat"><div class="lbl">本月收入</div><div class="val success" id="monIncome">¥0</div></div>
+      <div class="stat"><div class="lbl">本月支出</div><div class="val danger" id="monExpense">¥0</div></div>
+      <div class="stat"><div class="lbl">本月净利</div><div class="val" id="monNet">¥0</div></div>
+      <div class="stat"><div class="lbl">固定月支出</div><div class="val danger" id="fixedCost">¥0</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>🏠 固定支出配置</span><span class="more" onclick="editFixed()">编辑</span></div>
+    <div id="fixedList"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>🎯 收入目标</span></div>
+    <div class="field">
+      <label>本月收入目标(元)</label>
+      <input type="number" id="monthTarget" placeholder="例如20000" oninput="updateTarget()">
+    </div>
+    <div style="background:#f8fafc;border-radius:10px;padding:12px;font-size:13px;line-height:1.8" id="targetAdvice"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>📈 收支明细</span><span class="more" onclick="openModal('incomeModal')">+记一笔</span></div>
+    <div id="txnList"></div>
+  </div>
+</section>
+
+<!-- ===== 页面4: 内容创作 ===== -->
+<section class="page" id="page-content">
+  <div class="card">
+    <div class="card-title"><span>✍️ 本周内容进度</span></div>
+    <div class="field">
+      <label>视频剪辑 (目标4条)</label>
+      <div class="progress"><i id="wkVideoBar" style="background:var(--primary);width:0%"></i></div>
+      <div style="font-size:12px;color:var(--text-sub)" id="wkVideoTxt">0/4</div>
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <label>公众号文章 (目标5篇)</label>
+      <div class="progress"><i id="wkArticleBar" style="background:var(--success);width:0%"></i></div>
+      <div style="font-size:12px;color:var(--text-sub)" id="wkArticleTxt">0/5</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span>💡 选题提纲库</span>
+      <button class="btn sm ghost" onclick="genTopic()">🔄 换一批</button>
+    </div>
+    <div class="seg">
+      <button class="active" onclick="switchTopicTab(this,'video')">视频脚本</button>
+      <button onclick="switchTopicTab(this,'article')">公众号</button>
+    </div>
+    <div id="topicList"></div>
+  </div>
+</section>
+
+<!-- ===== 页面5: 统计 ===== -->
+<section class="page" id="page-stats">
+  <div class="card">
+    <div class="card-title"><span>📊 本周表现</span></div>
+    <div class="stats-grid" style="margin-bottom:0">
+      <div class="stat"><div class="lbl">本周收入</div><div class="val success" id="wkIncome">¥0</div></div>
+      <div class="stat"><div class="lbl">招到司机</div><div class="val" id="wkDriver">0</div></div>
+      <div class="stat"><div class="lbl">平均日工作</div><div class="val" id="avgWork">0h</div></div>
+      <div class="stat"><div class="lbl">平均日休息</div><div class="val warn" id="avgRest">0h</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>📋 本周任务清单</span></div>
+    <div id="weekTaskList"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>🗓️ 本月日历</span></div>
+    <div class="day-grid" id="calGrid"></div>
+    <div style="font-size:11px;color:var(--text-sub);margin-top:8px">
+      <span style="display:inline-block;width:10px;height:10px;background:#dcfce7;border-radius:3px;vertical-align:middle;margin-right:3px"></span>有记录
+      &nbsp;<span style="display:inline-block;width:10px;height:10px;border:2px solid var(--primary);border-radius:3px;vertical-align:middle;margin-right:3px"></span>今天
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>📁 数据管理</span></div>
+    <div class="row">
+      <div class="field"><button class="btn ghost" onclick="exportData()">📤 导出备份</button></div>
+      <div class="field"><button class="btn ghost" onclick="document.getElementById('importFile').click()">📥 导入</button></div>
+    </div>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    <details>
+      <summary>⚠️ 清空所有数据</summary>
+      <button class="btn danger sm" onclick="clearAll()">确认清空</button>
+    </details>
+  </div>
+</section>
+
+<!-- ===== 底部Tab ===== -->
+<nav class="tabbar">
+  <div class="tab active" onclick="switchPage('today',this)"><span class="ico">🏠</span>今日</div>
+  <div class="tab" onclick="switchPage('rebate',this)"><span class="ico">🎯</span>反费</div>
+  <div class="tab" onclick="switchPage('finance',this)"><span class="ico">💰</span>财务</div>
+  <div class="tab" onclick="switchPage('content',this)"><span class="ico">✍️</span>创作</div>
+  <div class="tab" onclick="switchPage('stats',this)"><span class="ico">📊</span>统计</div>
+</nav>
+
+<!-- ===== 浮动按钮 ===== -->
+<button class="fab" onclick="openModal('incomeModal')">+</button>
+
+<!-- ===== 弹窗: 录入司机 ===== -->
+<div class="modal-mask" id="driverModal">
+  <div class="modal">
+    <h3>🎯 录入司机 <span class="close" onclick="closeModal('driverModal')">×</span></h3>
+    <div class="field"><label>司机姓名</label><input id="dName" placeholder="例如：张师傅"></div>
+    <div class="field"><label>联系电话</label><input id="dPhone" placeholder="选填"></div>
+    <div class="row">
+      <div class="field"><label>提车日期</label><input type="date" id="dPickupDate"></div>
+      <div class="field"><label>反费金额</label><input type="number" id="dAmount" placeholder="如800"></div>
+    </div>
+    <div class="field">
+      <label>司机类型</label>
+      <select id="dType" onchange="onTypeChange()">
+        <option value="zero">0元提车(入职后7天起收500)</option>
+        <option value="paid">入职交钱(可立即收反费)</option>
+        <option value="delay">延期型(约1个月到账)</option>
+        <option value="custom">自定义节点</option>
+      </select>
+    </div>
+    <div id="customNodeWrap" style="display:none">
+      <div class="field"><label>自定义收款节点(提车后第N天)</label><input type="number" id="dCustomDay" placeholder="例如15"></div>
+    </div>
+    <div class="field"><label>备注</label><input id="dNote" placeholder="选填，如车型、平台等"></div>
+    <div style="background:#e0f2fe;border-radius:10px;padding:10px;font-size:12px;color:#075985;margin-bottom:10px" id="typeHint"></div>
+    <button class="btn success" onclick="saveDriver()">💾 保存</button>
+  </div>
+</div>
+
+<!-- ===== 弹窗: 记一笔收支 ===== -->
+<div class="modal-mask" id="incomeModal">
+  <div class="modal">
+    <h3>💰 记一笔 <span class="close" onclick="closeModal('incomeModal')">×</span></h3>
+    <div class="seg">
+      <button class="active" onclick="switchTxnType(this,'income')">收入</button>
+      <button onclick="switchTxnType(this,'expense')">支出</button>
+    </div>
+    <div class="field"><label>日期</label><input type="date" id="tDate"></div>
+    <div class="field"><label>金额</label><input type="number" id="tAmount" placeholder="金额"></div>
+    <div class="field"><label>分类</label><select id="tCategory"></select></div>
+    <div class="field" id="driverLinkWrap" style="display:none">
+      <label>关联司机(反费到账)</label>
+      <select id="tDriver"><option value="">不关联</option></select>
+    </div>
+    <div class="field"><label>备注</label><input id="tNote" placeholder="选填"></div>
+    <button class="btn" onclick="saveTxn()">💾 保存</button>
+  </div>
+</div>
+
+<!-- ===== 弹窗: 编辑固定支出 ===== -->
+<div class="modal-mask" id="fixedModal">
+  <div class="modal">
+    <h3>🏠 固定支出 <span class="close" onclick="closeModal('fixedModal')">×</span></h3>
+    <div id="fixedEditList"></div>
+    <button class="btn ghost sm" onclick="addFixedItem()" style="margin:10px 0">+ 添加项</button>
+    <button class="btn" onclick="saveFixed()">💾 保存</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   网约车司机招募工作台 - 核心逻辑
+   数据存储于 localStorage，单文件可离线运行
+   ============================================================ */
+
+const DB_KEY = 'driver_workbench_v1';
+let db = loadDB();
+let curRebateTab = 'pending';
+let curTopicTab = 'video';
+let curTxnType = 'income';
+let editingDriverId = null;
+
+// ===== 数据结构 =====
+function defaultDB(){
+  return {
+    days: {},          // { '2026-07-25': {work,workHours,restHours,video,article} }
+    drivers: [],       // [{id,name,phone,pickupDate,amount,type,customDay,note,received:[{amt,date}],status}]
+    txns: [],          // [{id,date,type,amount,category,note,driverId}]
+    fixedCost: [
+      {name:'房租',amount:3300,day:1},
+      {name:'水电',amount:500,day:5},
+      {name:'四只猫',amount:500,day:5},
+      {name:'其他消费',amount:6000,day:1},
+    ],
+    monthTarget: 20000,
+    weekGoal: {video:4, article:5},
+    createdAt: Date.now()
+  };
+}
+function loadDB(){
+  try{
+    const raw = localStorage.getItem(DB_KEY);
+    if(!raw) return defaultDB();
+    const d = JSON.parse(raw);
+    // 兼容补全
+    if(!d.fixedCost) d.fixedCost = defaultDB().fixedCost;
+    if(!d.days) d.days = {};
+    if(!d.drivers) d.drivers = [];
+    if(!d.txns) d.txns = [];
+    if(!d.monthTarget) d.monthTarget = 20000;
+    if(!d.weekGoal) d.weekGoal = {video:4,article:5};
+    return d;
+  }catch(e){ return defaultDB(); }
+}
+function saveDB(){ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+// ===== 工具函数 =====
+const pad = n => String(n).padStart(2,'0');
+const todayStr = () => { const d=new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
+const fmtMoney = n => '¥' + (Math.round(n*100)/100).toLocaleString();
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function dateOffset(dateStr, days){
+  const d = new Date(dateStr); d.setDate(d.getDate()+days);
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+function daysBetween(a,b){
+  return Math.round((new Date(b)-new Date(a))/86400000);
+}
+function weekStart(dateStr){
+  const d = dateStr? new Date(dateStr) : new Date();
+  const day = d.getDay()||7; // 周日=7
+  d.setDate(d.getDate()-day+1);
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+function isOverdue(dateStr){
+  return new Date(dateStr) < new Date(todayStr());
+}
+
+// ===== 反费节点计算 =====
+function rebateNodes(driver){
+  // 返回 [{label, date, amount, status, txId}]
+  const nodes = [];
+  const base = driver.pickupDate;
+  if(!base) return nodes;
+  if(driver.type==='paid'){
+    // 入职交钱，第一步即可收全额
+    nodes.push({label:'入职即收(全额)', date:base, amount:driver.amount, status:'pending'});
+  } else if(driver.type==='zero'){
+    // 0元提车，每7天收500，直到收完
+    let remain = driver.amount;
+    let step = 1;
+    let d = base;
+    while(remain>0){
+      d = dateOffset(base, 7*step);
+      const amt = Math.min(500, remain);
+      nodes.push({label:`第${step}期(提车后${7*step}天)`, date:d, amount:amt, status:'pending'});
+      remain -= amt;
+      step++;
+      if(step>20) break; // 防止死循环
+    }
+  } else if(driver.type==='delay'){
+    // 延期型，约1个月
+    nodes.push({label:'满月到账', date:dateOffset(base,30), amount:driver.amount, status:'pending'});
+  } else if(driver.type==='custom'){
+    const day = driver.customDay||7;
+    nodes.push({label:`提车后${day}天`, date:dateOffset(base,day), amount:driver.amount, status:'pending'});
+  }
+  // 根据已收记录更新状态
+  const received = driver.received||[];
+  nodes.forEach(n=>{
+    const matched = received.find(r=>r.nodeLabel===n.label);
+    if(matched){ n.status='done'; n.txId=matched.txId; n.recvDate=matched.date; }
+    else if(isOverdue(n.date)) n.status='overdue';
+  });
+  return nodes;
+}
+
+function driverStatus(driver){
+  const nodes = rebateNodes(driver);
+  const pending = nodes.filter(n=>n.status!=='done');
+  if(pending.length===0) return 'done';
+  if(pending.some(n=>n.status==='overdue')) return 'overdue';
+  return 'pending';
+}
+
+// ===== 页面切换 =====
+function switchPage(name, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  el.classList.add('active');
+  if(name==='today') renderToday();
+  if(name==='rebate') renderRebate();
+  if(name==='finance') renderFinance();
+  if(name==='content') renderContent();
+  if(name==='stats') renderStats();
+  window.scrollTo(0,0);
+}
+
+// ===== 顶部目标条 =====
+function renderTopbar(){
+  const d = new Date();
+  const week = ['日','一','二','三','四','五','六'][d.getDay()];
+  document.getElementById('topDate').textContent = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 周${week}`;
+  const monthStart = `${d.getFullYear()}-${pad(d.getMonth()+1)}-01`;
+  const monthEnd = `${d.getFullYear()}-${pad(d.getMonth()+1)}-31`;
+  const monIncome = db.txns.filter(t=>t.type==='income'&&t.date>=monthStart&&t.date<=monthEnd).reduce((s,t)=>s+t.amount,0);
+  const target = db.monthTarget||0;
+  const pct = target>0? Math.min(100, Math.round(monIncome/target*100)) : 0;
+  document.getElementById('goalBar').style.width = pct+'%';
+  document.getElementById('goalTxt').textContent = `本月收入 ${fmtMoney(monIncome)} / 目标 ${fmtMoney(target)}`;
+  document.getElementById('goalPct').textContent = pct+'%';
+}
+
+// ===== 今日页 =====
+function renderToday(){
+  renderTopbar();
+  const t = todayStr();
+  const d = new Date();
+  document.getElementById('todayDateLbl').textContent = `${d.getMonth()+1}月${d.getDate()}日`;
+  // 今日收支
+  const tIncome = db.txns.filter(x=>x.type==='income'&&x.date===t).reduce((s,x)=>s+x.amount,0);
+  const tExpense = db.txns.filter(x=>x.type==='expense'&&x.date===t).reduce((s,x)=>s+x.amount,0);
+  const dayGoal = calcDayGoal();
+  document.getElementById('todayIncome').textContent = fmtMoney(tIncome);
+  document.getElementById('todayExpense').textContent = fmtMoney(tExpense);
+  document.getElementById('dayGoal').textContent = fmtMoney(dayGoal);
+  document.getElementById('dayRate').textContent = dayGoal>0? Math.round(tIncome/dayGoal*100)+'%' : '0%';
+  // 加载今日记录
+  const day = db.days[t]||{};
+  document.getElementById('workContent').value = day.work||'';
+  document.getElementById('workHours').value = day.workHours||'';
+  document.getElementById('restHours').value = day.restHours||'';
+  document.getElementById('videoDone').value = day.video||0;
+  document.getElementById('articleDone').value = day.article||0;
+  // 今日交易列表
+  const tlist = db.txns.filter(x=>x.date===t).sort((a,b)=>b.id.localeCompare(a.id));
+  const listEl = document.getElementById('todayTxnList');
+  if(tlist.length===0){ listEl.innerHTML = '<div class="empty"><span class="ico">💰</span>今日暂无收支记录</div>'; }
+  else{
+    listEl.innerHTML = tlist.map(x=>{
+      const drv = x.driverId? db.drivers.find(d=>d.id===x.driverId) : null;
+      return `<div class="item">
+        <div class="avatar" style="background:${x.type==='income'?'#dcfce7':'#fee2e2'};color:${x.type==='income'?'#166534':'#991b1b'}">${x.type==='income'?'↗':'↘'}</div>
+        <div class="body">
+          <div class="t"><span>${x.category}${drv?' · '+drv.name:''}</span><span class="${x.type==='income'?'success':'danger'}" style="font-weight:600">${x.type==='income'?'+':'-'}${fmtMoney(x.amount)}</span></div>
+          ${x.note?`<div class="d">${x.note}</div>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+  // 提醒
+  renderAlerts();
+}
+
+function calcDayGoal(){
+  // 月目标 - 已收收入（本月除今天外），剩余天数分摊
+  const d = new Date();
+  const monthStart = `${d.getFullYear()}-${pad(d.getMonth()+1)}-01`;
+  const yesterday = dateOffset(todayStr(),-1);
+  const monIncome = db.txns.filter(t=>t.type==='income'&&t.date>=monthStart&&t.date<=yesterday).reduce((s,t)=>s+t.amount,0);
+  const target = db.monthTarget||0;
+  const remain = target - monIncome;
+  if(remain<=0) return 0;
+  // 本月剩余天数（含今天）
+  const lastDay = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+  const remainDays = lastDay - d.getDate() + 1;
+  return Math.round(remain/remainDays);
+}
+
+function saveToday(){
+  const t = todayStr();
+  db.days[t] = {
+    work: document.getElementById('workContent').value.trim(),
+    workHours: parseFloat(document.getElementById('workHours').value)||0,
+    restHours: parseFloat(document.getElementById('restHours').value)||0,
+    video: parseInt(document.getElementById('videoDone').value)||0,
+    article: parseInt(document.getElementById('articleDone').value)||0,
+    updatedAt: Date.now()
+  };
+  saveDB();
+  toast('✅ 今日记录已保存');
+}
+
+// ===== 提醒 =====
+function renderAlerts(){
+  let html = '';
+  // 反费提醒
+  const overdueDrivers = [];
+  const dueToday = [];
+  db.drivers.forEach(d=>{
+    const nodes = rebateNodes(d);
+    nodes.forEach(n=>{
+      if(n.status==='overdue') overdueDrivers.push({driver:d, node:n});
+      else if(n.status==='pending' && n.date===todayStr()) dueToday.push({driver:d, node:n});
+    });
+  });
+  if(overdueDrivers.length>0){
+    html += `<div class="alert-bar danger"><span class="ico">⚠️</span><div><b>${overdueDrivers.length}笔反费已逾期，请尽快催收：</b><br>`;
+    html += overdueDrivers.slice(0,3).map(x=>`${x.driver.name} · ${x.node.label} · ${fmtMoney(x.node.amount)}（应到${x.node.date}）`).join('<br>');
+    if(overdueDrivers.length>3) html += `<br>...等${overdueDrivers.length}笔`;
+    html += `<br><span style="font-size:11px;opacity:.8">点击「反费」页确认收款</span></div></div>`;
+  }
+  if(dueToday.length>0){
+    html += `<div class="alert-bar"><span class="ico">🔔</span><div><b>今日有${dueToday.length}笔反费可收：</b><br>`;
+    html += dueToday.map(x=>`${x.driver.name} · ${x.node.label} · ${fmtMoney(x.node.amount)}`).join('<br>');
+    html += `</div></div>`;
+  }
+  // 日目标提醒
+  const dayGoal = calcDayGoal();
+  const tIncome = db.txns.filter(x=>x.type==='income'&&x.date===todayStr()).reduce((s,x)=>s+x.amount,0);
+  if(dayGoal>0 && tIncome<dayGoal){
+    html += `<div class="alert-bar"><span class="ico">🎯</span><div>今日还需 <b>${fmtMoney(dayGoal-tIncome)}</b> 达到日目标，加油招募！</div></div>`;
+  }
+  document.getElementById('todayAlerts').innerHTML = html;
+  // 反费页提醒
+  document.getElementById('rebateAlerts').innerHTML = overdueDrivers.length>0?
+    `<div class="alert-bar danger"><span class="ico">⚠️</span><div><b>${overdueDrivers.length}笔反费已逾期</b>，请尽快催收并确认到账。</div></div>` : '';
+}
+
+// ===== 反费页 =====
+function onTypeChange(){
+  const t = document.getElementById('dType').value;
+  document.getElementById('customNodeWrap').style.display = t==='custom'?'block':'none';
+  const hints = {
+    paid:'💡 入职交钱类型：司机入职交钱后，第一步钱即可作为反费收取，一次性收完后即结束。',
+    zero:'💡 0元提车类型：系统自动每7天生成一个500元收款节点，直到反费金额收完为止。',
+    delay:'💡 延期型：约需满月后才能拿到反费，系统会在提车后30天提醒。',
+    custom:'💡 自定义节点：设置提车后第N天为收款日期。'
+  };
+  document.getElementById('typeHint').textContent = hints[t]||'';
+}
+
+function saveDriver(){
+  const name = document.getElementById('dName').value.trim();
+  if(!name){ toast('请填写司机姓名','warn'); return; }
+  const pickupDate = document.getElementById('dPickupDate').value;
+  if(!pickupDate){ toast('请选择提车日期','warn'); return; }
+  const amount = parseFloat(document.getElementById('dAmount').value)||0;
+  if(amount<=0){ toast('请填写反费金额','warn'); return; }
+  const drv = {
+    id: editingDriverId||uid(),
+    name,
+    phone: document.getElementById('dPhone').value.trim(),
+    pickupDate,
+    amount,
+    type: document.getElementById('dType').value,
+    customDay: parseInt(document.getElementById('dCustomDay').value)||7,
+    note: document.getElementById('dNote').value.trim(),
+    received: [],
+    createdAt: Date.now()
+  };
+  if(editingDriverId){
+    const idx = db.drivers.findIndex(d=>d.id===editingDriverId);
+    drv.received = db.drivers[idx].received;
+    db.drivers[idx] = drv;
+  } else {
+    db.drivers.push(drv);
+  }
+  saveDB();
+  closeModal('driverModal');
+  resetDriverForm();
+  renderRebate();
+  toast('✅ 司机已保存');
+}
+
+function resetDriverForm(){
+  editingDriverId = null;
+  document.getElementById('dName').value='';
+  document.getElementById('dPhone').value='';
+  document.getElementById('dPickupDate').value=todayStr();
+  document.getElementById('dAmount').value='';
+  document.getElementById('dType').value='zero';
+  document.getElementById('dCustomDay').value='';
+  document.getElementById('dNote').value='';
+  onTypeChange();
+}
+
+function openDriverModal(id){
+  editingDriverId = id;
+  const d = db.drivers.find(x=>x.id===id);
+  if(d){
+    document.getElementById('dName').value=d.name;
+    document.getElementById('dPhone').value=d.phone||'';
+    document.getElementById('dPickupDate').value=d.pickupDate;
+    document.getElementById('dAmount').value=d.amount;
+    document.getElementById('dType').value=d.type;
+    document.getElementById('dCustomDay').value=d.customDay||'';
+    document.getElementById('dNote').value=d.note||'';
+    onTypeChange();
+    openModal('driverModal');
+  }
+}
+
+function switchRebateTab(el, tab){
+  curRebateTab = tab;
+  el.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderRebate();
+}
+
+function renderRebate(){
+  renderAlerts();
+  const list = document.getElementById('driverList');
+  let drivers = db.drivers.slice().sort((a,b)=>b.pickupDate.localeCompare(a.pickupDate));
+  if(curRebateTab==='pending') drivers = drivers.filter(d=>driverStatus(d)!=='done');
+  else if(curRebateTab==='done') drivers = drivers.filter(d=>driverStatus(d)==='done');
+
+  if(drivers.length===0){
+    list.innerHTML = '<div class="empty"><span class="ico">🎯</span>暂无记录<br>点击「+录入司机」添加</div>';
+    return;
+  }
+  list.innerHTML = drivers.map(d=>{
+    const nodes = rebateNodes(d);
+    const status = driverStatus(d);
+    const totalReceived = (d.received||[]).reduce((s,r)=>s+r.amount,0);
+    const statusBadge = status==='done'?'<span class="badge success">已结清</span>':
+      status==='overdue'?'<span class="badge danger">有逾期</span>':'<span class="badge warn">进行中</span>';
+    const nodesHtml = nodes.map(n=>{
+      const isDone = n.status==='done';
+      const isOver = n.status==='overdue';
+      return `<div style="display:flex;align-items:center;gap:8px;padding:8px;background:${isDone?'#f0fdf4':isOver?'#fef2f2':'#f8fafc'};border-radius:8px;margin-top:6px">
+        <span style="font-size:16px">${isDone?'✅':isOver?'⚠️':'⏳'}</span>
+        <div style="flex:1;font-size:12px">
+          <div><b>${n.label}</b> · ${fmtMoney(n.amount)}</div>
+          <div style="color:var(--text-sub)">${isDone?'已收 '+n.recvDate:'应到 '+n.date}${isOver?' · 已逾期':''}</div>
+        </div>
+        ${isDone?'':`<button class="btn sm success" onclick="confirmRebate('${d.id}','${n.label}',${n.amount})">确认收款</button>`}
+      </div>`;
+    }).join('');
+    return `<div class="card" style="margin-bottom:10px;padding:12px">
+      <div class="item" style="padding:6px 0;border:none">
+        <div class="avatar">👤</div>
+        <div class="body">
+          <div class="t"><span>${d.name} ${statusBadge}</span><span style="font-size:13px;font-weight:600">${fmtMoney(totalReceived)}/${fmtMoney(d.amount)}</span></div>
+          <div class="meta">
+            <span>提车 ${d.pickupDate}</span>
+            <span class="badge gray">${d.type==='zero'?'0元提车':d.type==='paid'?'入职交钱':d.type==='delay'?'延期型':'自定义'}</span>
+            ${d.note?`<span>📝${d.note}</span>`:''}
+          </div>
+        </div>
+        <button class="btn sm ghost" onclick="openDriverModal('${d.id}')">编辑</button>
+      </div>
+      ${nodesHtml}
+    </div>`;
+  }).join('');
+}
+
+function confirmRebate(driverId, nodeLabel, amount){
+  const d = db.drivers.find(x=>x.id===driverId);
+  if(!d) return;
+  const node = rebateNodes(d).find(n=>n.label===nodeLabel);
+  if(!node) return;
+  // 添加收款记录
+  const recvDate = todayStr();
+  const txId = uid();
+  d.received = d.received||[];
+  d.received.push({nodeLabel, amount:node.amount, date:recvDate, txId});
+  // 自动记一笔收入
+  db.txns.push({
+    id:txId, date:recvDate, type:'income', amount:node.amount,
+    category:'反费收入', note:`${d.name} ${nodeLabel}`, driverId:d.id
+  });
+  saveDB();
+  renderRebate();
+  toast(`✅ 已确认收款 ${fmtMoney(node.amount)}`);
+}
+
+// ===== 财务页 =====
+function renderFinance(){
+  renderTopbar();
+  const d = new Date();
+  const mon = `${d.getFullYear()}年${d.getMonth()+1}月`;
+  document.getElementById('financeMonth').textContent = mon;
+  const monthStart = `${d.getFullYear()}-${pad(d.getMonth()+1)}-01`;
+  const monthEnd = `${d.getFullYear()}-${pad(d.getMonth()+1)}-31`;
+  const monIncome = db.txns.filter(t=>t.type==='income'&&t.date>=monthStart&&t.date<=monthEnd).reduce((s,t)=>s+t.amount,0);
+  const monExpense = db.txns.filter(t=>t.type==='expense'&&t.date>=monthStart&&t.date<=monthEnd).reduce((s,t)=>s+t.amount,0);
+  const fixedTotal = db.fixedCost.reduce((s,f)=>s+f.amount,0);
+  document.getElementById('monIncome').textContent = fmtMoney(monIncome);
+  document.getElementById('monExpense').textContent = fmtMoney(monExpense);
+  const net = monIncome - monExpense;
+  const netEl = document.getElementById('monNet');
+  netEl.textContent = (net>=0?'+':'') + fmtMoney(net);
+  netEl.className = 'val ' + (net>=0?'success':'danger');
+  document.getElementById('fixedCost').textContent = fmtMoney(fixedTotal);
+  // 固定支出列表
+  document.getElementById('fixedList').innerHTML = db.fixedCost.map(f=>
+    `<div class="item"><div class="avatar">🏠</div><div class="body"><div class="t"><span>${f.name}</span><span class="danger">${fmtMoney(f.amount)}</span></div><div class="d">每月${f.day}日</div></div></div>`
+  ).join('');
+  // 目标建议
+  document.getElementById('monthTarget').value = db.monthTarget||'';
+  updateTarget();
+  // 交易明细
+  const txns = db.txns.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
+  const listEl = document.getElementById('txnList');
+  if(txns.length===0){ listEl.innerHTML='<div class="empty"><span class="ico">💰</span>暂无记录</div>'; return; }
+  listEl.innerHTML = txns.slice(0,50).map(x=>{
+    const drv = x.driverId? db.drivers.find(d=>d.id===x.driverId) : null;
+    return `<div class="item">
+      <div class="avatar" style="background:${x.type==='income'?'#dcfce7':'#fee2e2'};color:${x.type==='income'?'#166534':'#991b1b'}">${x.type==='income'?'↗':'↘'}</div>
+      <div class="body">
+        <div class="t"><span>${x.date} ${x.category}${drv?' · '+drv.name:''}</span><span class="${x.type==='income'?'success':'danger'}" style="font-weight:600">${x.type==='income'?'+':'-'}${fmtMoney(x.amount)}</span></div>
+        ${x.note?`<div class="d">${x.note}</div>`:''}
+      </div>
+      <button class="btn sm ghost" onclick="delTxn('${x.id}')" style="color:var(--danger)">删</button>
+    </div>`;
+  }).join('');
+}
+
+function updateTarget(){
+  const target = parseFloat(document.getElementById('monthTarget').value)||0;
+  db.monthTarget = target;
+  saveDB();
+  const fixedTotal = db.fixedCost.reduce((s,f)=>s+f.amount,0);
+  const d = new Date();
+  const lastDay = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+  const remainDays = lastDay - d.getDate() + 1;
+  const monthStart = `${d.getFullYear()}-${pad(d.getMonth()+1)}-01`;
+  const yesterday = dateOffset(todayStr(),-1);
+  const monIncome = db.txns.filter(t=>t.type==='income'&&t.date>=monthStart&&t.date<=yesterday).reduce((s,t)=>s+t.amount,0);
+  const remain = target - monIncome;
+  const dayGoal = remain>0? Math.round(remain/remainDays) : 0;
+  // 按每司机平均1500元估算
+  const avgRebate = 1500;
+  const needDrivers = dayGoal>0? Math.ceil(dayGoal/avgRebate) : 0;
+  const advice = `
+    <b>📊 目标拆解：</b><br>
+    • 月固定支出 <b>${fmtMoney(fixedTotal)}</b>（房租${db.fixedCost[0].amount}+水电${db.fixedCost[1].amount}+猫${db.fixedCost[2].amount}+消费${db.fixedCost[3].amount}）<br>
+    • 收入目标 <b>${fmtMoney(target)}</b><br>
+    • 本月已收 <b>${fmtMoney(monIncome)}</b>，剩余 <b>${fmtMoney(Math.max(0,remain))}</b><br>
+    • 剩余 <b>${remainDays}</b> 天，日均需赚 <b style="color:var(--warn)">${fmtMoney(dayGoal)}</b><br>
+    • 按每司机反费均值${fmtMoney(avgRebate)}估算，每天需招 <b>${needDrivers}</b> 名司机并到账<br>
+    • <span style="color:var(--text-sub)">注：0元提车反费分期到账，实际需多储备在途司机</span>
+  `;
+  document.getElementById('targetAdvice').innerHTML = advice;
+  renderTopbar();
+}
+
+function editFixed(){
+  const list = document.getElementById('fixedEditList');
+  list.innerHTML = db.fixedCost.map((f,i)=>
+    `<div class="row" style="margin-bottom:8px;align-items:flex-end">
+      <div class="field"><label>名称</label><input value="${f.name}" onchange="updFixed(${i},'name',this.value)"></div>
+      <div class="field"><label>金额</label><input type="number" value="${f.amount}" onchange="updFixed(${i},'amount',parseFloat(this.value))"></div>
+      <div class="field"><label>日</label><input type="number" value="${f.day}" onchange="updFixed(${i},'day',parseInt(this.value))"></div>
+      <button class="btn sm danger" onclick="delFixed(${i})">删</button>
+    </div>`
+  ).join('');
+  openModal('fixedModal');
+}
+let _fixedDraft = null;
+function updFixed(i,key,val){
+  if(!_fixedDraft) _fixedDraft = JSON.parse(JSON.stringify(db.fixedCost));
+  _fixedDraft[i][key] = val;
+}
+function delFixed(i){
+  if(!_fixedDraft) _fixedDraft = JSON.parse(JSON.stringify(db.fixedCost));
+  _fixedDraft.splice(i,1);
+  editFixed();
+}
+function addFixedItem(){
+  if(!_fixedDraft) _fixedDraft = JSON.parse(JSON.stringify(db.fixedCost));
+  _fixedDraft.push({name:'新项目',amount:0,day:1});
+  editFixed();
+}
+function saveFixed(){
+  if(_fixedDraft){ db.fixedCost = _fixedDraft; _fixedDraft=null; saveDB(); }
+  closeModal('fixedModal');
+  renderFinance();
+  toast('✅ 固定支出已保存');
+}
+
+function delTxn(id){
+  if(!confirm('确认删除这笔记录？')) return;
+  // 同时删除关联的反费收款记录
+  const txn = db.txns.find(t=>t.id===id);
+  if(txn && txn.driverId){
+    const drv = db.drivers.find(d=>d.id===txn.driverId);
+    if(drv && drv.received){
+      drv.received = drv.received.filter(r=>r.txId!==id);
+    }
+  }
+  db.txns = db.txns.filter(t=>t.id!==id);
+  saveDB();
+  renderFinance();
+  toast('已删除');
+}
+
+// ===== 收支弹窗 =====
+function switchTxnType(el, type){
+  curTxnType = type;
+  el.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  updateCategory();
+  document.getElementById('driverLinkWrap').style.display = type==='income'?'block':'none';
+}
+function updateCategory(){
+  const sel = document.getElementById('tCategory');
+  const cats = curTxnType==='income'?
+    ['反费收入','其他收入'] :
+    ['房租','水电','猫咪','日常消费','餐饮','交通','其他支出'];
+  sel.innerHTML = cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+  // 司机关联
+  const drvSel = document.getElementById('tDriver');
+  drvSel.innerHTML = '<option value="">不关联</option>' + db.drivers.map(d=>{
+    const status = driverStatus(d);
+    return `<option value="${d.id}">${d.name}（${d.pickupDate}，${fmtMoney(d.amount)}）${status==='done'?'[已结清]':''}</option>`;
+  }).join('');
+}
+function saveTxn(){
+  const date = document.getElementById('tDate').value || todayStr();
+  const amount = parseFloat(document.getElementById('tAmount').value);
+  if(!amount||amount<=0){ toast('请填写金额','warn'); return; }
+  const category = document.getElementById('tCategory').value;
+  const note = document.getElementById('tNote').value.trim();
+  const driverId = document.getElementById('tDriver').value || null;
+  const id = uid();
+  db.txns.push({id,date,type:curTxnType,amount,category,note,driverId});
+  // 若关联司机且是收入，则记为反费收款
+  if(driverId && curTxnType==='income'){
+    const drv = db.drivers.find(d=>d.id===driverId);
+    if(drv){
+      // 找到第一个待收节点
+      const nodes = rebateNodes(drv);
+      const pending = nodes.find(n=>n.status!=='done');
+      if(pending){
+        drv.received = drv.received||[];
+        drv.received.push({nodeLabel:pending.label, amount, date, txId:id});
+      }
+    }
+  }
+  saveDB();
+  closeModal('incomeModal');
+  document.getElementById('tAmount').value='';
+  document.getElementById('tNote').value='';
+  renderToday();
+  toast('✅ 已保存');
+}
+
+// ===== 内容创作页 =====
+function renderContent(){
+  // 本周进度
+  const ws = weekStart(todayStr());
+  const weekDays = db.days;
+  let wkVideo=0, wkArticle=0;
+  Object.entries(weekDays).forEach(([k,v])=>{
+    if(k>=ws && k<dateOffset(ws,7)){
+      wkVideo += v.video||0;
+      wkArticle += v.article||0;
+    }
+  });
+  const vGoal = db.weekGoal.video, aGoal = db.weekGoal.article;
+  document.getElementById('wkVideoBar').style.width = Math.min(100,wkVideo/vGoal*100)+'%';
+  document.getElementById('wkVideoTxt').textContent = `${wkVideo}/${vGoal} 条`;
+  document.getElementById('wkArticleBar').style.width = Math.min(100,wkArticle/aGoal*100)+'%';
+  document.getElementById('wkArticleTxt').textContent = `${wkArticle}/${aGoal} 篇`;
+  genTopic();
+}
+
+function switchTopicTab(el, tab){
+  curTopicTab = tab;
+  el.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  genTopic();
+}
+
+// 选题库
+const TOPICS = {
+  video: [
+    {title:'0元提车真香？网约车新手避坑指南', tags:['新手','避坑'], outline:'1. 开头：0元提车吸引眼球\n2. 解释0元提车模式（押金/流水要求）\n3. 三大坑：时长要求、违约金、流水抽成\n4. 适合人群分析（有车VS无车）\n5. 结尾：理性选择，留言咨询'},
+    {title:'网约车一天流水多少才不亏？算笔账', tags:['收入','算账'], outline:'1. 抛出问题：多少流水才赚钱\n2. 成本拆解：租车/充电/餐饮/时间\n3. 不同城市对比（一线VS二线）\n4. 盈亏平衡点计算\n5. 给新手的建议'},
+    {title:'跑网约车前必须办的5件事', tags:['新手','准备'], outline:'1. 双证齐全（人证+车证）\n2. 选对平台（多平台对比）\n3. 租车vs买车利弊\n4. 保险要点\n5. 心态准备'},
+    {title:'老司机支招：高峰时段怎么跑最赚', tags:['技巧','收入'], outline:'1. 早高峰7-9点策略\n2. 晚高峰17-19点策略\n3. 夜间22点后机会\n4. 雨天/节假日溢价\n5. 接单区域选择'},
+    {title:'网约车司机真实收入大揭秘', tags:['真实','收入'], outline:'1. 开头：月入过万是真的吗\n2. 三种司机收入对比（全职/兼职/专职）\n3. 影响收入的关键因素\n4. 真实账单展示\n5. 如何提升收入'},
+    {title:'从负债到月入2万，网约车改变了我', tags:['故事','励志'], outline:'1. 个人故事引入\n2. 选择网约车的原因\n3. 起步阶段的困难\n4. 收入增长历程\n5. 给同样处境人的建议'},
+    {title:'网约车vs出租车，哪个更赚钱', tags:['对比'], outline:'1. 平台机制对比\n2. 收入结构差异\n3. 自由度对比\n4. 成本对比\n5. 结论与建议'},
+    {title:'新手第一周跑网约车，我踩的坑', tags:['新手','故事'], outline:'1. 第一天的紧张\n2. 导航踩坑\n3. 平台规则踩坑\n4. 乘客沟通踩坑\n5. 总结经验'},
+    {title:'网约车充电省钱攻略', tags:['技巧','省钱'], outline:'1. 充电时段选择（谷电时段）\n2. 充电站选择技巧\n3. 快充vs慢充成本\n4. 续航管理\n5. 省钱小妙招'},
+    {title:'为什么越来越多人选择跑网约车', tags:['行业','趋势'], outline:'1. 就业市场现状\n2. 网约车优势：灵活、门槛低\n3. 收入稳定性分析\n4. 适合人群\n5. 行业前景'},
+  ],
+  article: [
+    {title:'2026年网约车行业现状与机遇分析', tags:['行业','分析'], outline:'引言：网约车市场新变化\n一、政策环境解读\n二、平台格局变化\n三、司机收入趋势\n四、新能源车影响\n五、给从业者的建议\n结语'},
+    {title:'网约车司机招募：如何辨别靠谱平台', tags:['招募','避坑'], outline:'一、看平台资质（运输证）\n二、看车辆来源（自有无车）\n三、看合同条款（重点5条）\n四、看抽成比例\n五、看司机口碑\n六、签约前必问清单'},
+    {title:'新手跑网约车必读：收入、成本、风险全解析', tags:['新手','指南'], outline:'一、收入构成（流水+奖励）\n二、固定成本（租车/油费/保险）\n三、隐性成本（时间/健康）\n四、常见风险（违章/事故/差评）\n五、盈亏平衡测算\n六、新手建议'},
+    {title:'网约车司机时间管理术：跑得少赚得多', tags:['技巧','效率'], outline:'一、黄金时段表\n二、休息与接单平衡\n三、区域轮换策略\n四、平台切换技巧\n五、健康管理\n六、工具推荐'},
+    {title:'从上班族到网约车司机，这3年我经历了什么', tags:['故事','转行'], outline:'一、辞职的勇气\n二、第一年的摸索\n三、第二年的稳定\n四、第三年的思考\n五、收入变化曲线\n六、不后悔的理由\n七、给犹豫者的建议'},
+    {title:'网约车保险怎么买最划算', tags:['保险','省钱'], outline:'一、营运险vs非营运险\n二、必买险种清单\n三、保额选择建议\n四、保险公司对比\n五、理赔注意事项\n六、省钱技巧'},
+    {title:'新能源车跑网约车，到底省不省钱', tags:['新能源','成本'], outline:'一、油电成本对比\n二、购车/租车成本\n三、续航焦虑问题\n四、充电时间成本\n五、保值率分析\n六、综合结论'},
+    {title:'网约车司机如何应对差评和投诉', tags:['技巧','服务'], outline:'一、差评的影响\n二、常见差评原因\n三、预防差评的5个习惯\n四、申诉技巧\n五、心态调整\n六、平台规则利用'},
+    {title:'月入2万的网约车司机，都在做这5件事', tags:['高收入','方法'], outline:'一、选对时段\n二、选对区域\n三、多平台运营\n四、服务差异化\n五、持续学习优化\n六、真实案例'},
+    {title:'网约车新手第一月生存指南', tags:['新手','指南'], outline:'一、第一周：熟悉平台\n二、第二周：摸索规律\n三、第三周：优化路线\n四、第四周：稳定收入\n五、常见问题FAQ\n六、心理建设'},
+  ]
+};
+
+function genTopic(){
+  const pool = TOPICS[curTopicTab];
+  // 随机抽4个
+  const shuffled = pool.slice().sort(()=>Math.random()-0.5).slice(0,4);
+  document.getElementById('topicList').innerHTML = shuffled.map((t,i)=>
+    `<div class="topic-item">
+      <div class="tt">${i+1}. ${t.title}</div>
+      <div>${t.tags.map(tg=>`<span class="tag">${tg}</span>`).join('')}</div>
+      <div class="dd">${t.outline}</div>
+      <div class="acts">
+        <button class="btn sm" onclick="copyTopic(${JSON.stringify(t).replace(/"/g,'&quot;')})">📋 复制提纲</button>
+        <button class="btn sm ghost" onclick="copyTopic('${t.title}')">复制标题</button>
+      </div>
+    </div>`
+  ).join('');
+}
+
+function copyTopic(obj){
+  let text;
+  if(typeof obj==='string') text = obj;
+  else text = `${obj.title}\n\n${obj.outline}`;
+  // 兼容iOS
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand('copy'); toast('✅ 已复制'); }
+  catch(e){ toast('复制失败，请手动选择','warn'); }
+  document.body.removeChild(ta);
+}
+
+// ===== 统计页 =====
+function renderStats(){
+  renderTopbar();
+  const ws = weekStart(todayStr());
+  const we = dateOffset(ws,6);
+  // 本周收入
+  const wkIncome = db.txns.filter(t=>t.type==='income'&&t.date>=ws&&t.date<=we).reduce((s,t)=>s+t.amount,0);
+  document.getElementById('wkIncome').textContent = fmtMoney(wkIncome);
+  // 本周招到司机
+  const wkDrivers = db.drivers.filter(d=>d.pickupDate>=ws&&d.pickupDate<=we).length;
+  document.getElementById('wkDriver').textContent = wkDrivers;
+  // 平均工作/休息
+  const weekDays = Object.entries(db.days).filter(([k])=>k>=ws&&k<=we);
+  const avgW = weekDays.length>0? (weekDays.reduce((s,[,v])=>s+(v.workHours||0),0)/weekDays.length).toFixed(1) : 0;
+  const avgR = weekDays.length>0? (weekDays.reduce((s,[,v])=>s+(v.restHours||0),0)/weekDays.length).toFixed(1) : 0;
+  document.getElementById('avgWork').textContent = avgW+'h';
+  document.getElementById('avgRest').textContent = avgR+'h';
+  // 本周任务清单
+  renderWeekTasks(ws,we);
+  // 日历
+  renderCalendar();
+}
+
+function renderWeekTasks(ws,we){
+  let wkVideo=0, wkArticle=0;
+  Object.entries(db.days).forEach(([k,v])=>{
+    if(k>=ws&&k<dateOffset(ws,7)){ wkVideo+=v.video||0; wkArticle+=v.article||0; }
+  });
+  const vGoal=db.weekGoal.video, aGoal=db.weekGoal.article;
+  const tasks = [
+    {name:'视频剪辑',cur:wkVideo,goal:vGoal,unit:'条',color:'var(--primary)'},
+    {name:'公众号文章',cur:wkArticle,goal:aGoal,unit:'篇',color:'var(--success)'},
+  ];
+  // 招募目标（本周）
+  const wkDrivers = db.drivers.filter(d=>d.pickupDate>=ws&&d.pickupDate<=we).length;
+  tasks.push({name:'本周招募司机',cur:wkDrivers,goal:3,unit:'人',color:'var(--warn)'});
+  // 反费催收
+  const pendingCount = db.drivers.filter(d=>driverStatus(d)!=='done').length;
+  tasks.push({name:'反费催收（在途）',cur:pendingCount,goal:pendingCount,unit:'笔',color:'var(--danger)',isTrack:true});
+  document.getElementById('weekTaskList').innerHTML = tasks.map(t=>{
+    const pct = t.isTrack?100 : Math.min(100,Math.round(t.cur/t.goal*100));
+    const status = t.isTrack?'进行中':(t.cur>=t.goal?'已完成':'进行中');
+    const badge = t.isTrack?'<span class="badge warn">待跟进</span>':(t.cur>=t.goal?'<span class="badge success">完成</span>':'<span class="badge warn">进行中</span>');
+    return `<div class="item">
+      <div class="body">
+        <div class="t"><span>${t.name} ${badge}</span><span style="font-size:13px">${t.cur}/${t.goal} ${t.unit}</span></div>
+        <div class="progress"><i style="width:${pct}%;background:${t.color}"></i></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderCalendar(){
+  const d = new Date();
+  const y=d.getFullYear(), m=d.getMonth();
+  const first = new Date(y,m,1);
+  const firstDay = first.getDay()||7;
+  const lastDate = new Date(y,m+1,0).getDate();
+  const tStr = todayStr();
+  let html='';
+  // 表头
+  ['一','二','三','四','五','六','日'].forEach(w=>html+=`<div style="text-align:center;font-size:11px;color:var(--text-sub);padding:4px">${w}</div>`);
+  // 空格
+  for(let i=1;i<firstDay;i++) html+='<div></div>';
+  for(let i=1;i<=lastDate;i++){
+    const ds = `${y}-${pad(m+1)}-${pad(i)}`;
+    const has = db.days[ds] || db.txns.some(t=>t.date===ds);
+    const isToday = ds===tStr;
+    html += `<div class="dc ${has?'has':''} ${isToday?'today':''}" onclick="viewDay('${ds}')">${i}${has?'<div style="font-size:9px">●</div>':''}</div>`;
+  }
+  document.getElementById('calGrid').innerHTML = html;
+}
+
+function viewDay(ds){
+  const day = db.days[ds];
+  const txns = db.txns.filter(t=>t.date===ds);
+  let info = `📅 ${ds}\n\n`;
+  if(day){
+    info += `工作：${day.work||'无记录'}\n`;
+    info += `工作${day.workHours||0}h / 休息${day.restHours||0}h\n`;
+    info += `视频${day.video||0}条 / 公众号${day.article||0}篇\n\n`;
+  } else info += '无工作记录\n\n';
+  if(txns.length>0){
+    info += '收支：\n';
+    txns.forEach(t=>info += `${t.type==='income'?'↗':'↘'} ${t.category} ${fmtMoney(t.amount)}\n`);
+  } else info += '无收支';
+  alert(info);
+}
+
+// ===== 数据导入导出 =====
+function exportData(){
+  const blob = new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `工作台备份_${todayStr()}.json`;
+  a.click();
+  toast('✅ 已导出备份');
+}
+function importData(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(confirm('导入将覆盖现有数据，确认？')){
+        db = Object.assign(defaultDB(), data);
+        saveDB();
+        renderToday();
+        toast('✅ 导入成功');
+      }
+    }catch(err){ toast('导入失败：文件格式错误','warn'); }
+  };
+  reader.readAsText(file);
+}
+function clearAll(){
+  if(!confirm('⚠️ 确认清空所有数据？此操作不可恢复！')) return;
+  if(!confirm('再次确认：所有司机、收支、记录都将删除！')) return;
+  localStorage.removeItem(DB_KEY);
+  db = defaultDB();
+  saveDB();
+  renderToday();
+  toast('已清空');
+}
+
+// ===== 弹窗 =====
+function openModal(id){
+  if(id==='incomeModal'){
+    document.getElementById('tDate').value = todayStr();
+    document.getElementById('tAmount').value='';
+    document.getElementById('tNote').value='';
+    updateCategory();
+  }
+  if(id==='driverModal' && !editingDriverId){
+    resetDriverForm();
+  }
+  document.getElementById(id).classList.add('show');
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('show');
+  if(id==='driverModal') editingDriverId=null;
+}
+
+// ===== Toast =====
+let _toastTimer;
+function toast(msg, type){
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = `position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+    background:${type==='warn'?'#f59e0b':'rgba(0,0,0,.85)'};color:#fff;
+    padding:12px 20px;border-radius:10px;font-size:14px;z-index:9999;
+    box-shadow:0 4px 14px rgba(0,0,0,.2);max-width:80%;text-align:center`;
+  document.body.appendChild(t);
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(()=>t.remove(), 2000);
+}
+
+// ===== 初始化 =====
+document.getElementById('dPickupDate').value = todayStr();
+renderToday();
+
+// 点击遮罩关闭
+document.querySelectorAll('.modal-mask').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('show'); });
+});
+</script>
+</body>
+</html>
